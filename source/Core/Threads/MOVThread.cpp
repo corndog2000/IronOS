@@ -163,6 +163,16 @@ void startMOVTask(void const *argument __unused) {
   uint16_t tripCounter = 0;
 #endif
   for (;;) {
+
+    uint8_t ExternalTempVal = 3;
+    uint8_t* p_ExternalTempVal = &ExternalTempVal;
+    bool ExternalI2C_read = FRToSI2C::Mem_Read((0x55 << 1), 0x01, p_ExternalTempVal, 1);
+    OLED::setCursor(0, 0);
+    OLED::printNumber(ExternalI2C_read, 1, FontStyle::LARGE);
+    OLED::setCursor(50, 0);
+    OLED::printNumber(ExternalTempVal, 1, FontStyle::LARGE);
+    OLED::refresh();
+
     int32_t threshold = 1500 + (9 * 200);
     threshold -= getSettingValue(SettingsOptions::Sensitivity) * 200; // 200 is the step size
     readAccelerometer(tx, ty, tz, rotation);
