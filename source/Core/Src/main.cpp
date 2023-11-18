@@ -60,8 +60,8 @@ int main(void) {
   MOVTaskHandle = osThreadCreate(osThread(MOVTask), NULL);
 
   /* definition and creation of GUITask - The OLED control & update*/
-  osThreadStaticDef(GUITask, startGUITask, osPriorityBelowNormal, 0, GUITaskStackSize, GUITaskBuffer, &GUITaskControlBlock);
-  GUITaskHandle = osThreadCreate(osThread(GUITask), NULL);
+  //osThreadStaticDef(GUITask, startGUITask, osPriorityBelowNormal, 0, GUITaskStackSize, GUITaskBuffer, &GUITaskControlBlock);
+  //GUITaskHandle = osThreadCreate(osThread(GUITask), NULL);
 
   resetWatchdog();
 

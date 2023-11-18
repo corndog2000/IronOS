@@ -23,6 +23,7 @@
 #include "main.hpp"
 #include "power.hpp"
 #include "stdlib.h"
+#include "stdio.h"
 #include "task.h"
 
 #define MOVFilter 8
@@ -152,6 +153,10 @@ void startMOVTask(void const *argument __unused) {
     osDelay(2 * TICKS_SECOND);
   }
 
+  OLED::initialize(); // start up the LCD
+  OLED::setBrightness(getSettingValue(SettingsOptions::OLEDBrightness));
+  OLED::setInverseDisplay(getSettingValue(SettingsOptions::OLEDInversion));
+
   int16_t     datax[MOVFilter] = {0};
   int16_t     datay[MOVFilter] = {0};
   int16_t     dataz[MOVFilter] = {0};
@@ -159,19 +164,35 @@ void startMOVTask(void const *argument __unused) {
   int16_t     tx = 0, ty = 0, tz = 0;
   int32_t     avgx, avgy, avgz;
   Orientation rotation = ORIENTATION_FLAT;
+
+  // New Code Variables Start
+  uint8_t ExternalTempVal = 0;
+  uint8_t* p_ExternalTempVal = &ExternalTempVal;
+  char buffer[4];
+  bool FirstDelay = 1;
+  // New Code Variables End
+
 #ifdef ACCEL_EXITS_ON_MOVEMENT
   uint16_t tripCounter = 0;
 #endif
   for (;;) {
 
-    uint8_t ExternalTempVal = 3;
-    uint8_t* p_ExternalTempVal = &ExternalTempVal;
-    bool ExternalI2C_read = FRToSI2C::Mem_Read((0x55 << 1), 0x01, p_ExternalTempVal, 1);
+    /*
+    if (FirstDelay) {
+      osDelay(5000);
+      FirstDelay = 0;
+    }
+    */
+    
+    // New Code Start
+    I2C_CLASS::Receive((0x55 << 1), p_ExternalTempVal, 1 * sizeof(uint8_t));
     OLED::setCursor(0, 0);
-    OLED::printNumber(ExternalI2C_read, 1, FontStyle::LARGE);
-    OLED::setCursor(50, 0);
-    OLED::printNumber(ExternalTempVal, 1, FontStyle::LARGE);
+    OLED::printNumber(ExternalTempVal, 3, FontStyle::LARGE, false);
+    sprintf(buffer, "%u", ExternalTempVal); // Convert the value to a string
+    OLED::setCursor(60, 0);
+    OLED::print(buffer, FontStyle::LARGE);
     OLED::refresh();
+    // New Code End
 
     int32_t threshold = 1500 + (9 * 200);
     threshold -= getSettingValue(SettingsOptions::Sensitivity) * 200; // 200 is the step size
@@ -211,6 +232,7 @@ void startMOVTask(void const *argument __unused) {
 
     // If movement has occurred then we update the tick timer
     bool overThreshold = error > threshold;
+
 #ifdef ACCEL_EXITS_ON_MOVEMENT
     if (overThreshold) {
       tripCounter++;
