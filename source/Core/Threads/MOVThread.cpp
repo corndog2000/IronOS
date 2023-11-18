@@ -153,10 +153,6 @@ void startMOVTask(void const *argument __unused) {
     osDelay(2 * TICKS_SECOND);
   }
 
-  OLED::initialize(); // start up the LCD
-  OLED::setBrightness(getSettingValue(SettingsOptions::OLEDBrightness));
-  OLED::setInverseDisplay(getSettingValue(SettingsOptions::OLEDInversion));
-
   int16_t     datax[MOVFilter] = {0};
   int16_t     datay[MOVFilter] = {0};
   int16_t     dataz[MOVFilter] = {0};
@@ -166,10 +162,10 @@ void startMOVTask(void const *argument __unused) {
   Orientation rotation = ORIENTATION_FLAT;
 
   // New Code Variables Start
-  uint8_t ExternalTempVal = 0;
-  uint8_t* p_ExternalTempVal = &ExternalTempVal;
+  uint8_t ExternalTempVal[2] = {1, 2};
   char buffer[4];
   bool FirstDelay = 1;
+  bool ColonSeparator = 1;
   // New Code Variables End
 
 #ifdef ACCEL_EXITS_ON_MOVEMENT
@@ -185,12 +181,24 @@ void startMOVTask(void const *argument __unused) {
     */
     
     // New Code Start
-    I2C_CLASS::Receive((0x55 << 1), p_ExternalTempVal, 1 * sizeof(uint8_t));
+    I2C_CLASS::Receive((0x55 << 1), &ExternalTempVal[0], 2 * sizeof(uint8_t));
     OLED::setCursor(0, 0);
-    OLED::printNumber(ExternalTempVal, 3, FontStyle::LARGE, false);
-    sprintf(buffer, "%u", ExternalTempVal); // Convert the value to a string
-    OLED::setCursor(60, 0);
-    OLED::print(buffer, FontStyle::LARGE);
+    OLED::printNumber(ExternalTempVal[0], 2, FontStyle::LARGE, false);
+    if (ColonSeparator) {
+      OLED::setCursor(25, 0);
+      OLED::print(":", FontStyle::SMALL);
+      ColonSeparator = 0;
+    }
+    else {
+      OLED::setCursor(25, 0);
+      OLED::print(" ", FontStyle::SMALL);
+      ColonSeparator = 1;
+    }
+    OLED::setCursor(30, 0);
+    OLED::printNumber(ExternalTempVal[1], 2, FontStyle::LARGE, false);
+    //sprintf(buffer, "%u", ExternalTempVal); // Convert the value to a string
+    //OLED::setCursor(60, 0);
+    //OLED::print(buffer, FontStyle::LARGE);
     OLED::refresh();
     // New Code End
 
