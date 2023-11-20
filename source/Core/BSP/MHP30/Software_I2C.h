@@ -33,7 +33,7 @@
 
 #define SOFT_I2C_DELAY()              \
   {                                   \
-    for (int xx = 0; xx < 15; xx++) { \
+    for (int xx = 0; xx < 1000; xx++) { \
       asm("nop");                     \
     }                                 \
   }

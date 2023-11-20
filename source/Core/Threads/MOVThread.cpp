@@ -162,7 +162,7 @@ void startMOVTask(void const *argument __unused) {
   Orientation rotation = ORIENTATION_FLAT;
 
   // New Code Variables Start
-  uint8_t ExternalTempVal[2] = {1, 2};
+  uint8_t ExternalTempVal[6] = {1, 2, 3, 4, 5, 6};
   char buffer[4];
   bool FirstDelay = 1;
   bool ColonSeparator = 1;
@@ -181,25 +181,35 @@ void startMOVTask(void const *argument __unused) {
     */
     
     // New Code Start
-    I2C_CLASS::Receive((0x55 << 1), &ExternalTempVal[0], 2 * sizeof(uint8_t));
+    I2C_CLASS::Receive((0x42 << 1), &ExternalTempVal[0], 6);
+
+    /*
     OLED::setCursor(0, 0);
-    OLED::printNumber(ExternalTempVal[0], 2, FontStyle::LARGE, false);
+    OLED::printNumber(ExternalTempVal[0], 2, FontStyle::SMALL, false);
+    OLED::setCursor(15, 0);
+    OLED::printNumber(ExternalTempVal[1], 2, FontStyle::SMALL, false);
+    OLED::setCursor(30, 0);
+    OLED::printNumber(ExternalTempVal[2], 2, FontStyle::SMALL, false);
+    OLED::setCursor(45, 0);
+    OLED::printNumber(ExternalTempVal[3], 2, FontStyle::SMALL, false);
+    OLED::setCursor(60, 0);
+    OLED::printNumber(ExternalTempVal[4], 2, FontStyle::SMALL, false);
+    OLED::setCursor(75, 0);
+    OLED::printNumber(ExternalTempVal[5], 2, FontStyle::SMALL, false);
+
     if (ColonSeparator) {
-      OLED::setCursor(25, 0);
-      OLED::print(":", FontStyle::SMALL);
+      OLED::setCursor(90, 0);
+      OLED::print("A", FontStyle::SMALL);
       ColonSeparator = 0;
     }
     else {
-      OLED::setCursor(25, 0);
-      OLED::print(" ", FontStyle::SMALL);
+      OLED::setCursor(90, 0);
+      OLED::print("B", FontStyle::SMALL);
       ColonSeparator = 1;
     }
-    OLED::setCursor(30, 0);
-    OLED::printNumber(ExternalTempVal[1], 2, FontStyle::LARGE, false);
-    //sprintf(buffer, "%u", ExternalTempVal); // Convert the value to a string
-    //OLED::setCursor(60, 0);
-    //OLED::print(buffer, FontStyle::LARGE);
+
     OLED::refresh();
+    */
     // New Code End
 
     int32_t threshold = 1500 + (9 * 200);

@@ -149,29 +149,22 @@ void I2CBB2::Transmit(uint16_t DevAddress, uint8_t *pData, uint16_t Size) {
 void I2CBB2::Receive(uint16_t DevAddress, uint8_t *pData, uint16_t Size) {
   // I2C used by the OLED
 
-  setStatusLED(LED_STANDBY);
-
   if (!lock())
     return;
   start();
   bool ack = send(DevAddress | 1);
   if (!ack) {
-    setStatusLED(LED_COOLING_STILL_HOT);
     stop();
     unlock();
     return;
   }
   while (Size) {
-    setStatusLED(LED_HEATING);
     pData[0] = read(Size > 1);
     pData++;
     Size--;
   }
   stop();
   unlock();
-
-  setStatusLED(LED_HOT);
-
 }
 
 void I2CBB2::TransmitReceive(uint16_t DevAddress, uint8_t *pData_tx, uint16_t Size_tx, uint8_t *pData_rx, uint16_t Size_rx) {

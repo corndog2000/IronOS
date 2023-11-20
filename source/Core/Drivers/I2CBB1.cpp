@@ -19,12 +19,12 @@ void              I2CBB1::init() {
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
   GPIO_InitStruct.Pin   = SDA_Pin;
   GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_OD;
-  GPIO_InitStruct.Pull  = GPIO_PULLUP;
+  GPIO_InitStruct.Pull  = GPIO_NOPULL;
   HAL_GPIO_Init(SDA_GPIO_Port, &GPIO_InitStruct);
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
   GPIO_InitStruct.Pin   = SCL_Pin;
   GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_OD;
-  GPIO_InitStruct.Pull  = GPIO_PULLUP;
+  GPIO_InitStruct.Pull  = GPIO_NOPULL;
   HAL_GPIO_Init(SCL_GPIO_Port, &GPIO_InitStruct);
   SOFT_SDA1_HIGH();
   SOFT_SCL1_HIGH();
@@ -148,8 +148,6 @@ void I2CBB1::Transmit(uint16_t DevAddress, uint8_t *pData, uint16_t Size) {
 }
 
 void I2CBB1::Receive(uint16_t DevAddress, uint8_t *pData, uint16_t Size) { 
-  setStatusLED(LED_STANDBY);
-  
   if (!lock())
     return;
   start();
@@ -166,8 +164,6 @@ void I2CBB1::Receive(uint16_t DevAddress, uint8_t *pData, uint16_t Size) {
   }
   stop();
   unlock();
-
-  setStatusLED(LED_HOT);
 }
 
 void I2CBB1::TransmitReceive(uint16_t DevAddress, uint8_t *pData_tx, uint16_t Size_tx, uint8_t *pData_rx, uint16_t Size_rx) {
