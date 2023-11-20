@@ -40,7 +40,7 @@
  *  2 - Sleep Temperature
  *  3 - Sleep Off Temperature
  */
-#define AUTO_START_MODE 0 // Default to none
+#define AUTO_START_MODE 1 // Default to none
 
 /**
  * Locking Mode
@@ -99,8 +99,8 @@
  * Detailed soldering screen
  * Detailed idle screen (off for first time users)
  */
-#define DETAILED_SOLDERING 0 // 0: Disable 1: Enable - Default 0
-#define DETAILED_IDLE      0 // 0: Disable 1: Enable - Default 0
+#define DETAILED_SOLDERING 1 // 0: Disable 1: Enable - Default 0
+#define DETAILED_IDLE      1 // 0: Disable 1: Enable - Default 0
 
 // Due to large thermal mass of the PCB being heated we need to pull this back a bit
 #define THERMAL_RUNAWAY_TIME_SEC 45
