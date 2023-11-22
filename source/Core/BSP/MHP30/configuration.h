@@ -16,6 +16,12 @@
  * Temperature the iron sleeps at - default 150.0 C
  */
 
+#define TIP_CONTROL_PID
+#define TIP_PID_KP                55  // Reasonable compromise for most tips so far
+#define TIP_PID_KI                17   // About as high for stability across tips
+#define TIP_PID_KD                220 // Helps dampen smaller tips; ~= nothing for larger tips
+
+
 #define SLEEP_TEMP         150 // Default sleep temperature
 #define BOOST_TEMP         420 // Default boost temp.
 #define BOOST_MODE_ENABLED 1   // 0: Disable 1: Enable
@@ -99,8 +105,8 @@
  * Detailed soldering screen
  * Detailed idle screen (off for first time users)
  */
-#define DETAILED_SOLDERING 1 // 0: Disable 1: Enable - Default 0
-#define DETAILED_IDLE      1 // 0: Disable 1: Enable - Default 0
+#define DETAILED_SOLDERING 0 // 0: Disable 1: Enable - Default 0
+#define DETAILED_IDLE      0 // 0: Disable 1: Enable - Default 0
 
 // Due to large thermal mass of the PCB being heated we need to pull this back a bit
 #define THERMAL_RUNAWAY_TIME_SEC 45

@@ -4,7 +4,6 @@
  *  Created on: 12 Jun 2020
  *      Author: Ralim
  */
-#include "BSP.h"
 #include "configuration.h"
 #ifdef I2C_SOFT_BUS_2
 #include "FreeRTOS.h"
@@ -147,8 +146,6 @@ void I2CBB2::Transmit(uint16_t DevAddress, uint8_t *pData, uint16_t Size) {
 }
 
 void I2CBB2::Receive(uint16_t DevAddress, uint8_t *pData, uint16_t Size) {
-  // I2C used by the OLED
-
   if (!lock())
     return;
   start();

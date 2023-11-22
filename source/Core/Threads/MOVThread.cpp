@@ -23,8 +23,10 @@
 #include "main.hpp"
 #include "power.hpp"
 #include "stdlib.h"
-#include "stdio.h"
 #include "task.h"
+#include "OperatingModes.h"
+
+extern OperatingMode currentMode;
 
 #define MOVFilter 8
 uint8_t    accelInit        = 0;
@@ -161,56 +163,37 @@ void startMOVTask(void const *argument __unused) {
   int32_t     avgx, avgy, avgz;
   Orientation rotation = ORIENTATION_FLAT;
 
-  // New Code Variables Start
-  uint8_t ExternalTempVal[6] = {1, 2, 3, 4, 5, 6};
-  char buffer[4];
-  bool FirstDelay = 1;
-  bool ColonSeparator = 1;
-  // New Code Variables End
+  uint8_t ExternalTempVal[6] = {0, 0, 0, 0, 0, 0};
+  setSettingValue(SettingsOptions::SolderingTemp, 25);
+  
 
 #ifdef ACCEL_EXITS_ON_MOVEMENT
   uint16_t tripCounter = 0;
 #endif
   for (;;) {
 
-    /*
-    if (FirstDelay) {
-      osDelay(5000);
-      FirstDelay = 0;
-    }
-    */
-    
-    // New Code Start
+    osDelay(10000);
+    I2C_DELAY = 1000;
+
     I2C_CLASS::Receive((0x42 << 1), &ExternalTempVal[0], 6);
 
-    /*
-    OLED::setCursor(0, 0);
-    OLED::printNumber(ExternalTempVal[0], 2, FontStyle::SMALL, false);
-    OLED::setCursor(15, 0);
-    OLED::printNumber(ExternalTempVal[1], 2, FontStyle::SMALL, false);
-    OLED::setCursor(30, 0);
-    OLED::printNumber(ExternalTempVal[2], 2, FontStyle::SMALL, false);
-    OLED::setCursor(45, 0);
-    OLED::printNumber(ExternalTempVal[3], 2, FontStyle::SMALL, false);
-    OLED::setCursor(60, 0);
-    OLED::printNumber(ExternalTempVal[4], 2, FontStyle::SMALL, false);
-    OLED::setCursor(75, 0);
-    OLED::printNumber(ExternalTempVal[5], 2, FontStyle::SMALL, false);
-
-    if (ColonSeparator) {
-      OLED::setCursor(90, 0);
-      OLED::print("A", FontStyle::SMALL);
-      ColonSeparator = 0;
+    I2C_DELAY = 15;
+    
+    if (ExternalTempVal[0] == 0x53) { // 'S' in hex
+      // Solder / heat up
+      //if (currentMode != OperatingMode::soldering) {
+      //  gui_solderingMode(0); // enter soldering mode
+      //}
+      currentMode = OperatingMode::soldering;
+      uint16_t newTemp = ExternalTempVal[1] + ExternalTempVal[2];
+      setSettingValue(SettingsOptions::SolderingTemp, newTemp);
     }
-    else {
-      OLED::setCursor(90, 0);
-      OLED::print("B", FontStyle::SMALL);
-      ColonSeparator = 1;
+    else if (ExternalTempVal[0] == 0x43) { // 'C' in hex
+      // Cool down
+      uint16_t newTemp = 25;
+      setSettingValue(SettingsOptions::SolderingTemp, newTemp);
     }
-
-    OLED::refresh();
-    */
-    // New Code End
+    
 
     int32_t threshold = 1500 + (9 * 200);
     threshold -= getSettingValue(SettingsOptions::Sensitivity) * 200; // 200 is the step size

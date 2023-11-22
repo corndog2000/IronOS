@@ -5,7 +5,6 @@
  *      Author: Ralim
  */
 #include "configuration.h"
-#include "BSP.h"
 #ifdef I2C_SOFT_BUS_1
 #include "FreeRTOS.h"
 #include <I2CBB1.hpp>
@@ -147,7 +146,7 @@ void I2CBB1::Transmit(uint16_t DevAddress, uint8_t *pData, uint16_t Size) {
   unlock();
 }
 
-void I2CBB1::Receive(uint16_t DevAddress, uint8_t *pData, uint16_t Size) { 
+void I2CBB1::Receive(uint16_t DevAddress, uint8_t *pData, uint16_t Size) {
   if (!lock())
     return;
   start();

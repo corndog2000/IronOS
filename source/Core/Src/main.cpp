@@ -63,12 +63,6 @@ int main(void) {
   osThreadStaticDef(GUITask, startGUITask, osPriorityBelowNormal, 0, GUITaskStackSize, GUITaskBuffer, &GUITaskControlBlock);
   GUITaskHandle = osThreadCreate(osThread(GUITask), NULL);
 
-  /*
-  OLED::initialize(); // start up the LCD
-  OLED::setBrightness(getSettingValue(SettingsOptions::OLEDBrightness));
-  OLED::setInverseDisplay(getSettingValue(SettingsOptions::OLEDInversion));
-  */
-
   resetWatchdog();
 
   /* Start scheduler */

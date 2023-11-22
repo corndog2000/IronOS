@@ -13,6 +13,8 @@
 #include "main.hpp"
 #include <IRQ.h>
 
+uint16_t I2C_DELAY = 15;
+
 WS2812<GPIOA_BASE, WS2812_Pin, 1> ws2812;
 volatile uint16_t                 PWMSafetyTimer            = 0;
 volatile uint8_t                  pendingPWM                = 0;
@@ -297,7 +299,7 @@ void setPlatePullup(bool pullingUp) {
     HAL_GPIO_WritePin(PLATE_SENSOR_PULLUP_GPIO_Port, PLATE_SENSOR_PULLUP_Pin, GPIO_PIN_SET);
   } else {
     // Hi-z
-    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
     HAL_GPIO_WritePin(PLATE_SENSOR_PULLUP_GPIO_Port, PLATE_SENSOR_PULLUP_Pin, GPIO_PIN_RESET);
   }
   HAL_GPIO_Init(PLATE_SENSOR_PULLUP_GPIO_Port, &GPIO_InitStruct);
@@ -403,8 +405,7 @@ void setStatusLED(const enum StatusLED state) {
       ws2812.led_set_color(0, 0, 0xFF, 0); // green
       break;
     case LED_HEATING: {
-      //ws2812.led_set_color(0, ((HAL_GetTick() / 10) % 192) + 64, 0, 0); // Red fade
-      ws2812.led_set_color(0, 0xFF, 0xFF, 0xFF); // WHITE
+      ws2812.led_set_color(0, ((HAL_GetTick() / 10) % 192) + 64, 0, 0); // Red fade
     } break;
     case LED_HOT:
       ws2812.led_set_color(0, 0xFF, 0, 0); // red
