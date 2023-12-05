@@ -11,6 +11,8 @@ uint8_t toSend[6] = { 0x53, 0x1E, 0, 0, 0, 0 };
 uint8_t buf = 0;
 
 void setup() {
+  pinMode(LED_BUILTIN, OUTPUT);
+
   pinMode(INH_PIN, OUTPUT);
   pinMode(A_PIN, OUTPUT);
   pinMode(B_PIN, OUTPUT);
@@ -25,9 +27,6 @@ void setup() {
   Wire.onRequest(requestEvent);  // register event
 
   Serial.begin(115200);
-  while (!Serial.available()) {
-    ;
-  }
 }
 
 void loop() {
@@ -90,7 +89,14 @@ void loop() {
       Serial.println("The number is out of the 8-bit range. Please enter a number between 0 and 255.");
     }
   }
+
   Serial.println("...");
+
+  digitalWrite(LED_BUILTIN, HIGH);
+  delay(25);
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(25);
+
   delay(100);
 }
 
