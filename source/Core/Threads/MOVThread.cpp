@@ -172,7 +172,7 @@ void startMOVTask(void const *argument __unused) {
 #endif
   for (;;) {
 
-    osDelay(10000);
+    osDelay(3000);
     I2C_DELAY = 1000;
 
     I2C_CLASS::Receive((0x42 << 1), &ExternalTempVal[0], 6);
@@ -192,6 +192,9 @@ void startMOVTask(void const *argument __unused) {
       // Cool down
       uint16_t newTemp = 25;
       setSettingValue(SettingsOptions::SolderingTemp, newTemp);
+    }
+    else if (ExternalTempVal[0] == 0x52) { // 'R' in hex
+      reboot();
     }
     
 
