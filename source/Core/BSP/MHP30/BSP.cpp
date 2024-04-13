@@ -13,6 +13,8 @@
 #include "main.hpp"
 #include <IRQ.h>
 
+uint16_t I2C_DELAY = 15;
+
 WS2812<GPIOA_BASE, WS2812_Pin, 1> ws2812;
 volatile uint16_t                 PWMSafetyTimer            = 0;
 volatile uint8_t                  pendingPWM                = 0;
@@ -230,8 +232,9 @@ uint16_t getInputVoltageX10(uint16_t divisor, uint8_t sample) {
   static uint32_t samples[BATTFILTERDEPTH];
   static uint8_t  index = 0;
   if (preFillneeded) {
-    for (uint8_t i = 0; i < BATTFILTERDEPTH; i++)
+    for (uint8_t i = 0; i < BATTFILTERDEPTH; i++) {
       samples[i] = getADC(1);
+    }
     preFillneeded--;
   }
   if (sample) {
@@ -240,8 +243,9 @@ uint16_t getInputVoltageX10(uint16_t divisor, uint8_t sample) {
   }
   uint32_t sum = 0;
 
-  for (uint8_t i = 0; i < BATTFILTERDEPTH; i++)
+  for (uint8_t i = 0; i < BATTFILTERDEPTH; i++) {
     sum += samples[i];
+  }
 
   sum /= BATTFILTERDEPTH;
   if (divisor == 0) {
@@ -273,8 +277,9 @@ void unstick_I2C() {
     HAL_GPIO_WritePin(SCL_GPIO_Port, SCL_Pin, GPIO_PIN_SET);
 
     timeout_cnt++;
-    if (timeout_cnt > timeout)
+    if (timeout_cnt > timeout) {
       return;
+    }
   }
 }
 
@@ -292,15 +297,9 @@ void setPlatePullup(bool pullingUp) {
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   GPIO_InitStruct.Pin   = PLATE_SENSOR_PULLUP_Pin;
   GPIO_InitStruct.Pull  = GPIO_NOPULL;
-  if (pullingUp) {
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-    HAL_GPIO_WritePin(PLATE_SENSOR_PULLUP_GPIO_Port, PLATE_SENSOR_PULLUP_Pin, GPIO_PIN_SET);
-  } else {
-    // Hi-z
-    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-    HAL_GPIO_WritePin(PLATE_SENSOR_PULLUP_GPIO_Port, PLATE_SENSOR_PULLUP_Pin, GPIO_PIN_RESET);
-  }
+  GPIO_InitStruct.Mode  = pullingUp ? GPIO_MODE_OUTPUT_PP : GPIO_MODE_INPUT;
   HAL_GPIO_Init(PLATE_SENSOR_PULLUP_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_WritePin(PLATE_SENSOR_PULLUP_GPIO_Port, PLATE_SENSOR_PULLUP_Pin, pullingUp ? GPIO_PIN_SET : GPIO_PIN_RESET);
 }
 
 void performTipMeasurementStep(bool start) {
@@ -403,8 +402,7 @@ void setStatusLED(const enum StatusLED state) {
       ws2812.led_set_color(0, 0, 0xFF, 0); // green
       break;
     case LED_HEATING: {
-      //ws2812.led_set_color(0, ((HAL_GetTick() / 10) % 192) + 64, 0, 0); // Red fade
-      ws2812.led_set_color(0, 0xFF, 0xFF, 0xFF); // WHITE
+      ws2812.led_set_color(0, ((HAL_GetTick() / 10) % 192) + 64, 0, 0); // Red fade
     } break;
     case LED_HOT:
       ws2812.led_set_color(0, 0xFF, 0, 0); // red

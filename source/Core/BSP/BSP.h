@@ -25,6 +25,8 @@ extern const uint16_t powerPWM;
 // htim2.Init.Period, the full PWM cycle
 extern uint16_t totalPWM;
 
+extern uint16_t I2C_DELAY;
+
 // Called first thing in main() to init the hardware
 void preRToSInit();
 // Called once the RToS has started for any extra work

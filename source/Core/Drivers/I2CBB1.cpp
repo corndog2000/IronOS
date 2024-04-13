@@ -5,7 +5,6 @@
  *      Author: Ralim
  */
 #include "configuration.h"
-#include "BSP.h"
 #ifdef I2C_SOFT_BUS_1
 #include "FreeRTOS.h"
 #include <I2CBB1.hpp>
@@ -46,8 +45,9 @@ void              I2CBB1::init() {
 }
 
 bool I2CBB1::probe(uint8_t address) {
-  if (!lock())
+  if (!lock()) {
     return false;
+  }
   start();
   bool ack = send(address);
   stop();
@@ -56,8 +56,9 @@ bool I2CBB1::probe(uint8_t address) {
 }
 
 bool I2CBB1::Mem_Read(uint16_t DevAddress, uint16_t MemAddress, uint8_t *pData, uint16_t Size) {
-  if (!lock())
+  if (!lock()) {
     return false;
+  }
   start();
   bool ack = send(DevAddress);
   if (!ack) {
@@ -92,8 +93,9 @@ bool I2CBB1::Mem_Read(uint16_t DevAddress, uint16_t MemAddress, uint8_t *pData, 
 }
 
 bool I2CBB1::Mem_Write(uint16_t DevAddress, uint16_t MemAddress, const uint8_t *pData, uint16_t Size) {
-  if (!lock())
+  if (!lock()) {
     return false;
+  }
   start();
   bool ack = send(DevAddress);
   if (!ack) {
@@ -124,8 +126,9 @@ bool I2CBB1::Mem_Write(uint16_t DevAddress, uint16_t MemAddress, const uint8_t *
 }
 
 void I2CBB1::Transmit(uint16_t DevAddress, uint8_t *pData, uint16_t Size) {
-  if (!lock())
+  if (!lock()) {
     return;
+  }
   start();
   bool ack = send(DevAddress);
   if (!ack) {
@@ -147,9 +150,10 @@ void I2CBB1::Transmit(uint16_t DevAddress, uint8_t *pData, uint16_t Size) {
   unlock();
 }
 
-void I2CBB1::Receive(uint16_t DevAddress, uint8_t *pData, uint16_t Size) { 
-  if (!lock())
+void I2CBB1::Receive(uint16_t DevAddress, uint8_t *pData, uint16_t Size) {
+  if (!lock()) {
     return;
+  }
   start();
   bool ack = send(DevAddress | 1);
   if (!ack) {
@@ -167,10 +171,12 @@ void I2CBB1::Receive(uint16_t DevAddress, uint8_t *pData, uint16_t Size) {
 }
 
 void I2CBB1::TransmitReceive(uint16_t DevAddress, uint8_t *pData_tx, uint16_t Size_tx, uint8_t *pData_rx, uint16_t Size_rx) {
-  if (Size_tx == 0 && Size_rx == 0)
+  if (Size_tx == 0 && Size_rx == 0) {
     return;
-  if (lock() == false)
+  }
+  if (lock() == false) {
     return;
+  }
   if (Size_tx) {
     start();
     bool ack = send(DevAddress);
@@ -252,10 +258,11 @@ uint8_t I2CBB1::read(bool ack) {
   }
 
   SOFT_SDA1_HIGH();
-  if (ack)
+  if (ack) {
     write_bit(0);
-  else
+  } else {
     write_bit(1);
+  }
   return B;
 }
 
@@ -267,10 +274,11 @@ uint8_t I2CBB1::read_bit() {
   SOFT_SCL1_HIGH();
   SOFT_I2C_DELAY();
 
-  if (SOFT_SDA1_READ())
+  if (SOFT_SDA1_READ()) {
     b = 1;
-  else
+  } else {
     b = 0;
+  }
 
   SOFT_SCL1_LOW();
   return b;
@@ -279,7 +287,8 @@ uint8_t I2CBB1::read_bit() {
 void I2CBB1::unlock() { xSemaphoreGive(I2CSemaphore); }
 
 bool I2CBB1::lock() {
-  if (I2CSemaphore == NULL) {}
+  if (I2CSemaphore == NULL) {
+  }
   bool a = xSemaphoreTake(I2CSemaphore, (TickType_t)100) == pdTRUE;
   return a;
 }
@@ -310,16 +319,18 @@ bool I2CBB1::writeRegistersBulk(const uint8_t address, const I2C_REG *registers,
     if (!I2C_RegisterWrite(address, registers[index].reg, registers[index].val)) {
       return false;
     }
-    if (registers[index].pause_ms)
+    if (registers[index].pause_ms) {
       delay_ms(registers[index].pause_ms);
+    }
   }
   return true;
 }
 
 bool I2CBB1::wakePart(uint16_t DevAddress) {
   // wakepart is a special case  where only the device address is sent
-  if (!lock())
+  if (!lock()) {
     return false;
+  }
   start();
   bool ack = send(DevAddress);
   stop();

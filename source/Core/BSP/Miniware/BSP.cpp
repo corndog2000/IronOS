@@ -207,8 +207,9 @@ void unstick_I2C() {
     HAL_GPIO_WritePin(SCL_GPIO_Port, SCL_Pin, GPIO_PIN_SET);
 
     timeout_cnt++;
-    if (timeout_cnt > timeout)
+    if (timeout_cnt > timeout) {
       return;
+    }
   }
 
   // 12. Configure the SCL and SDA I/Os as Alternate function Open-Drain.
@@ -307,6 +308,8 @@ void FinishMeasureTipResistance() {
     return;
   } else if (reading < 200) {
     tipShorted = true;
+  } else if (reading < 520) {
+    newRes = 40;
   } else if (reading < 800) {
     newRes = 62;
   } else {
@@ -359,14 +362,7 @@ uint8_t preStartChecks() {
   }
 
 #endif
-#ifdef POW_PD
-  // If we are in the middle of negotiating PD, wait until timeout
-  // Before turning on the heater
-  if (!USBPowerDelivery::negotiationComplete()) {
-    return 0;
-  }
 
-#endif
   return 1;
 }
 uint64_t getDeviceID() {
