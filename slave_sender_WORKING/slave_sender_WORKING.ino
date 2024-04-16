@@ -19,9 +19,10 @@ void setup() {
   pinMode(C_PIN, OUTPUT);
 
   digitalWrite(INH_PIN, LOW);
-  digitalWrite(A_PIN, LOW);
-  digitalWrite(B_PIN, LOW);
-  digitalWrite(C_PIN, LOW);
+  // By default we want to be on output 7 since there is no hotplate connected to that output.
+  digitalWrite(A_PIN, HIGH);
+  digitalWrite(B_PIN, HIGH);
+  digitalWrite(C_PIN, HIGH);
 
   Wire.begin(0x42);              // join i2c bus with address #2
   Wire.onRequest(requestEvent);  // register event
@@ -39,6 +40,14 @@ void loop() {
     if (number >= 0 && number <= 8) {
       Serial.print("Setting output to: ");
       Serial.println(number);
+
+      // Switch to output 7 for a second before switching to the real output pins.
+      digitalWrite(A_PIN, HIGH);
+      digitalWrite(B_PIN, HIGH);
+      digitalWrite(C_PIN, HIGH);
+
+      delay(1500);
+
       switch (number) {
         case 0:
           digitalWrite(A_PIN, LOW);
